@@ -1,0 +1,73 @@
+version: '3.8'
+
+networks:
+  data-network:
+    driver: bridge
+
+services:
+  # 1. DATABASE: PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: sim-postgres
+    environment:
+      POSTGRES_USER: adminhg
+      POSTGRES_PASSWORD: supersecretpasswordhg
+      POSTGRES_DB: db-hg
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data
+    networks:
+      - data-network
+    restart: always
+
+  # 2. DATABASE MANAGEMENT: pgAdmin
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: sim-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@email.com
+      PGADMIN_DEFAULT_PASSWORD: adminpassword
+    ports:
+      - "8080:80"
+    networks:
+      - data-network
+    depends_on:
+      - postgres
+    restart: always
+
+  # 3. ORCHESTRATOR: Apache Airflow (Single Container untuk Simulasi)
+  airflow:
+    image: apache/airflow:2.7.0-python3.10
+    container_name: sim-airflow
+    environment:
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor # Ubah ke LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://adminhg:supersecretpasswordhg@postgres:5432/db-hg
+      - AIRFLOW__CORE__FERNET_KEY=nvvXCA9rdzI3BnmSTAjOqzy5oOhS_mXsk955fv4rgQk= # Wajib diisi
+    command: standalone
+    # ... (sisanya tetap sama)
+    ports:
+      - "8085:8080"
+    volumes:
+      - ./data/airflow/dags:/opt/airflow/dags
+      - ./data/airflow/logs:/opt/airflow/logs
+      - ./data/airflow/plugins:/opt/airflow/plugins
+      - ./data/backup:/opt/airflow/backup
+    networks:
+      - data-network
+    depends_on:
+      - postgres
+    restart: always
+
+  # 4. MONITORING: Grafana
+  grafana:
+    image: grafana/grafana-oss
+    container_name: sim-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./data/grafana:/var/lib/grafana
+    networks:
+      - data-network
+    restart: always
