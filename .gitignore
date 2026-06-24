@@ -1,6 +1,7 @@
 data/postgresql/
 data/airflow/logs/
 data/airflow/dags/__pycache__/
+data/backup/
 .env
 __pycache__/
 .venv/

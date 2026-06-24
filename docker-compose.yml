@@ -30,6 +30,8 @@ services:
       PGADMIN_DEFAULT_PASSWORD: adminpassword
     ports:
       - "8080:80"
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin  
     networks:
       - data-network
     depends_on:
@@ -40,6 +42,8 @@ services:
   airflow:
     image: apache/airflow:2.7.0-python3.10
     container_name: sim-airflow
+    env_file:
+      - .env
     environment:
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor # Ubah ke LocalExecutor
