@@ -50,7 +50,7 @@ def extract_activechat_from_sleekflow(**kwargs):
     api_key = Variable.get("sleekflow_api_key", default_var="xx") 
     
     wib_tz = timezone(timedelta(hours=7))
-    h2 = datetime.now(wib_tz) - timedelta(days=5)
+    h2 = datetime.now(wib_tz) - timedelta(days=1)
     TANGGAL_MULAI = h2.strftime('%Y-%m-%d')
 
     headers = {

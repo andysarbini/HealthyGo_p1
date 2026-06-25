@@ -40,7 +40,8 @@ services:
 
   # 3. ORCHESTRATOR: Apache Airflow (Single Container untuk Simulasi)
   airflow:
-    image: apache/airflow:2.7.0-python3.10
+    #image: apache/airflow:2.7.0-python3.10
+    build: .
     container_name: sim-airflow
     env_file:
       - .env
